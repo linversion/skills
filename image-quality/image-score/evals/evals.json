@@ -1,0 +1,23 @@
+{
+  "skill_name": "image-score",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我看看这张 AI 生成的图片怎么样：output/cat_in_space.png，prompt 是 'a cat wearing a spacesuit on Mars, cinematic lighting, 8K'",
+      "expected_output": "应触发 image-score skill，运行 judge.py 对单张图片评分，返回五维分数摘要",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I changed my prompt from 'a dog in a park' to 'a golden retriever playing frisbee in central park at golden hour'. Did this actually improve the output? Here are the two images: output/v1.png and output/v2.png",
+      "expected_output": "应触发 image-score skill，对比两张图片的评分，给出维度级差异分析",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我跑了 5 个不同的 seed 生成了 5 张图，路径在 outputs/seed_{1..5}.png，prompt 都一样是 'cyberpunk cityscape at night, rain, neon lights'，帮我挑一张最好的",
+      "expected_output": "应触发 image-score skill，批处理 5 张图片，选出总分最高的",
+      "files": []
+    }
+  ]
+}
