@@ -1,5 +1,5 @@
 .DS_Store
 __pycache__/
-skills/play-reviews/assets/csv/
-skills/play-reviews/assets/dashboard/apps/
-skills/play-reviews/assets/dashboard/data.js
+skills/app-reviews/assets/csv/
+skills/app-reviews/assets/dashboard/apps/
+skills/app-reviews/assets/dashboard/data.js

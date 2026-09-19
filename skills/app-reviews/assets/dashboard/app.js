@@ -202,7 +202,8 @@
     var d = state.data;
     var stats = computeStats(d.reviews);
     $("app-id").textContent = d.title || d.app_id || "未知应用";
-    $("app-src").textContent = (d.app_id ? d.app_id + " · " : "") + (d.generated_at ? "DATA " + d.generated_at : "");
+    var plat = d.platform === "ios" ? "iOS" : d.platform === "android" ? "Android" : "";
+    $("app-src").textContent = (plat ? plat + " · " : "") + (d.app_id ? d.app_id + " · " : "") + (d.generated_at ? "DATA " + d.generated_at : "");
     $("head-meta").textContent = "REVIEW LEDGER · " + stats.total + " ENTRIES";
     var pool = poolAnnotation(d.reviews);
     var pooledCodes = 0;
@@ -572,7 +573,8 @@
 
     var ctrl = new AbortController();
     var tier = ($("tier-sel") && $("tier-sel").value) || "t1";
-    fetch("/api/scrape?app=" + encodeURIComponent(appId) + "&tier=" + tier, { signal: ctrl.signal })
+    var platform = (state.data && state.data.platform) || "android";
+    fetch("/api/scrape?app=" + encodeURIComponent(appId) + "&tier=" + tier + "&platform=" + platform, { signal: ctrl.signal })
       .then(function (res) {
         if (!res.ok || !res.body) throw new Error("HTTP " + res.status + " — 请用 scripts/serve_reviews.py 启动页面");
         var reader = res.body.getReader();
