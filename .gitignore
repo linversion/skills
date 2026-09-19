@@ -1,0 +1,5 @@
+.DS_Store
+__pycache__/
+play-reviews/assets/csv/
+play-reviews/assets/dashboard/apps/
+play-reviews/assets/dashboard/data.js
