@@ -1,0 +1,12 @@
+# .releaserc.yml — release-skills 工作流配置
+release:
+  target_globs:
+    - skills/*
+  changelog:
+    files:
+      - path: CHANGELOG.md
+        lang: en
+      - path: CHANGELOG.zh.md
+        lang: zh
+  tag:
+    prefix: v

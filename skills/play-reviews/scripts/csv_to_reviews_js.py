@@ -5,9 +5,9 @@
     python3 <skill目录>/scripts/csv_to_reviews_js.py <输入.csv> <输出data.js> [--app <包名>]
 
 示例:
-    python3 ~/Documents/Personal/skills/play-reviews/scripts/csv_to_reviews_js.py \
-        ~/Documents/Personal/skills/play-reviews/assets/csv/<app>.csv \
-        ~/Documents/Personal/skills/play-reviews/assets/dashboard/data.js --app <包名>
+    python3 <skill目录>/scripts/csv_to_reviews_js.py \
+        <skill目录>/assets/csv/<app>.csv \
+        <skill目录>/assets/dashboard/data.js --app <包名>
 """
 
 import csv
