@@ -18,7 +18,6 @@ npx skills add linversion/skills
 |------|------|
 | [image-score](skills/image-quality/image-score/) | AI 生图结构化评分，5 维度 17 项 |
 | [app-reviews](skills/app-reviews/) | 应用评论抓取 + 本地看板（Google Play / iOS App Store）：多应用切换、T1/T2/T3 市场层级、时间/星级/地区筛选、CSV/文本导出、离线模式 |
-| [release-skills](skills/release-skills/) | 通用发布工作流：自动识别版本文件与多语言 CHANGELOG，semver 升级、打标、推送 |
 
 ## 使用
 
