@@ -1,0 +1,51 @@
+{
+  "skill_name": "when-will-tibo-reset",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我在这台 Mac 上启动 AIHot Codex 重置动态监控，每小时检查一次；先只开系统通知，不要配置群机器人。",
+      "expected_output": "使用随 skill 附带的管理脚本安装 LaunchAgent，首次只建立基线，并用脱敏状态确认每小时任务已加载。",
+      "files": [],
+      "assertions": [
+        "从当前加载的 SKILL.md 位置解析脚本路径后调用 manage.py，不假设当前工作目录",
+        "使用 manage.py install，而不是让对话或前台 shell 常驻",
+        "明确首次检查只建立基线，不通知历史事件",
+        "状态汇报区分 LaunchAgent 已加载与用户实际看到通知"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "把 AIHot 的新动态同时发到飞书和企业微信。我已经准备好两个机器人 webhook，配置后帮我发测试消息，但不要在输出里泄露地址。",
+      "expected_output": "安全配置指定 webhook，保留未指定渠道现状，发送测试通知，并且所有状态和日志都不回显完整 URL。",
+      "files": [],
+      "assertions": [
+        "仅配置用户指定的飞书和企业微信渠道",
+        "不会在状态输出或最终回复中回显完整 webhook URL",
+        "使用 test-notification 验证已启用渠道，并说明提交成功不等于用户已看到"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "暂停 AIHot 提醒，但保留配置，过几天我还要恢复。",
+      "expected_output": "卸载当前 LaunchAgent 任务但保留配置和状态，不使用 purge。",
+      "files": [],
+      "assertions": [
+        "使用 stop 而不是 uninstall --purge",
+        "明确配置和事件基线仍被保留",
+        "给出后续通过 install 恢复的方法"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "我把这个完整 skill 目录安装到另一位普通 Codex 用户的 Mac 上，初次触发时要怎么确认它不依赖我的本机？",
+      "expected_output": "确认脚本、图标和通用版通知辅助 App 都随 skill 目录分发，使用当前用户的 home 目录保存状态，并为该安装生成自己的 actor UUID；说明 macOS、Python 3 前提（不需要 Xcode 或 Command Line Tools），以及复制到 Codex 可发现的 skills 目录这一安装步骤。",
+      "files": [],
+      "assertions": [
+        "不引用技能作者的绝对路径、下载目录或固定 actor UUID",
+        "要求完整分发 scripts/ 和 assets/ 下的图标及预编译通知辅助 App，而不只是 SKILL.md",
+        "说明普通用户需要将技能安装到自己的 Codex skills 搜索目录后才可触发",
+        "准确说明 macOS、Python 3 依赖，并指出不需要 Xcode Command Line Tools 或 Swift 编译器"
+      ]
+    }
+  ]
+}
