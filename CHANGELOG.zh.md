@@ -1,5 +1,16 @@
 # 更新日志
 
+## 0.3.0 - 2026-09-23
+
+### 新功能
+
+- 新增 `When will Tibo reset` 技能：每小时监控 AIHot Codex 重置动态，发送 macOS 原生通知，并可选转发到飞书、钉钉或企业微信。
+- 随技能分发通用版 macOS 通知辅助 App，用户无需安装 Xcode 或 Command Line Tools。
+
+### 文档
+
+- 将技能整理到 Productivity 和 Engineering 分类；README.md 默认使用英文，并新增可切换语言的中文版和效果截图。
+
 ## 0.2.0 - 2026-09-19
 
 ### 新功能

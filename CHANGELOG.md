@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 - 2026-09-23
+
+### Features
+
+- Add the `When will Tibo reset` skill for hourly AIHot Codex reset monitoring, native macOS notifications, and optional Feishu, DingTalk, or WeCom webhooks.
+- Bundle a universal macOS notification helper so users do not need Xcode or Command Line Tools.
+
+### Documentation
+
+- Organize skills into Productivity and Engineering categories; make the English README the default and add a Chinese version with language switching and screenshots.
+
 ## 0.2.0 - 2026-09-19
 
 ### Features
