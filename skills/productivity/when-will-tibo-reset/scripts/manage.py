@@ -96,7 +96,7 @@ def default_config(existing=None):
         "actor_id": actor_id,
         "user_agent": user_agent,
         "timeout_seconds": int(existing.get("timeout_seconds", 20)),
-        "notifier_app": str(notifier_app_path()),
+        "notifier_app": existing.get("notifier_app", str(notifier_app_path())),
         "notifications": {
             "macos": bool(existing.get("notifications", {}).get("macos", True)),
         },
@@ -194,8 +194,11 @@ def copy_runtime():
     source = Path(__file__).with_name("monitor.py")
     destination = runtime_script_path()
     destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source, destination)
-    os.chmod(destination, 0o700)
+    if not (destination.is_symlink() and destination.resolve() == source.resolve()):
+        if destination.is_symlink():
+            destination.unlink()
+        shutil.copy2(source, destination)
+        os.chmod(destination, 0o700)
     install_bundled_notifier_app()
 
 
@@ -207,7 +210,11 @@ def install_bundled_notifier_app():
         raise FileNotFoundError("Bundled assets/When will Tibo reset.app is missing or incomplete")
 
     app = notifier_app_path()
-    if app.exists():
+    if app.is_symlink():
+        if app.resolve() == source.resolve():
+            return
+        app.unlink()
+    elif app.exists():
         shutil.rmtree(app)
     shutil.copytree(source, app)
 

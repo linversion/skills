@@ -45,6 +45,8 @@ python3 "$SKILL_DIR/scripts/manage.py" install --language en
 
 安装会先访问一次接口建立基线，再注册每 3600 秒执行一次的 LaunchAgent。成功后告诉用户：已建立基线、定时任务是否已加载、Webhook 当前是否启用。
 
+本地开发时，可将安装目录的 `runtime/monitor.py` 链接到本 skill 的 `scripts/monitor.py`，将 `runtime/When will Tibo reset.app` 链接到 `assets/When will Tibo reset.app`。切换前备份原文件，并保留配置中的通知助手路径。安装脚本会保留这两个指向当前源文件的符号链接。源目录需保持可访问；脚本修改会在下次轮询生效，Swift 源码修改需先重新构建通知助手 App。
+
 ### 查看状态
 
 ```bash

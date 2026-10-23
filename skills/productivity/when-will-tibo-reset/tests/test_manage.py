@@ -1,4 +1,6 @@
+import contextlib
 import importlib.util
+import io
 import os
 import plistlib
 import tempfile
@@ -15,6 +17,24 @@ SPEC.loader.exec_module(manage)
 
 
 class ManageTests(unittest.TestCase):
+    def test_changing_language_preserves_existing_configuration(self):
+        for app_name in ("AIHot Notifier.app", "Custom Notifier.app"):
+            with self.subTest(app_name=app_name), tempfile.TemporaryDirectory() as directory:
+                with patch.dict(os.environ, {"AIHOT_MONITOR_HOME": directory}):
+                    original = manage.default_config()
+                    original["language"] = "en"
+                    original["notifier_app"] = str(Path(directory) / "runtime" / app_name)
+                    original["webhooks"]["feishu"] = "https://example.invalid/webhook"
+                    manage.write_config(original)
+
+                    with patch.object(manage, "is_loaded", return_value=True), \
+                            patch.object(manage, "read_interval", return_value=3600), \
+                            contextlib.redirect_stdout(io.StringIO()):
+                        self.assertEqual(manage.main(["configure", "--language", "zh"]), 0)
+
+                    expected = dict(original, language="zh")
+                    self.assertEqual(manage.load_config(), expected)
+
     def test_default_actor_is_generated_and_persisted_per_install(self):
         config = manage.default_config()
         actor_id = str(uuid.UUID(config["actor_id"]))
@@ -46,12 +66,37 @@ class ManageTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             with patch.dict(os.environ, {"AIHOT_MONITOR_HOME": temporary_directory}):
                 manage.copy_runtime()
+                manage.copy_runtime()
 
             runtime = Path(temporary_directory) / "runtime"
             self.assertTrue((runtime / "monitor.py").is_file())
             self.assertTrue(
                 (runtime / "When will Tibo reset.app" / "Contents" / "MacOS" / "AIHotNotifier").is_file()
             )
+
+    def test_reinstall_preserves_runtime_links_to_skill_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            runtime = Path(directory) / "runtime"
+            runtime.mkdir()
+            script = runtime / "monitor.py"
+            app = runtime / "When will Tibo reset.app"
+            source_script = SCRIPT.with_name("monitor.py")
+            source_app = SCRIPT.parents[1] / "assets" / app.name
+            script.symlink_to(source_script)
+            app.symlink_to(source_app, target_is_directory=True)
+            original_content = source_script.read_bytes()
+            original_mode = source_script.stat().st_mode
+
+            with patch.dict(os.environ, {"AIHOT_MONITOR_HOME": directory}):
+                manage.copy_runtime()
+                manage.copy_runtime()
+
+            self.assertTrue(script.is_symlink())
+            self.assertTrue(app.is_symlink())
+            self.assertTrue(script.samefile(source_script))
+            self.assertTrue(app.samefile(source_app))
+            self.assertEqual(source_script.read_bytes(), original_content)
+            self.assertEqual(source_script.stat().st_mode, original_mode)
 
     def test_notifier_bundle_uses_the_fixed_user_visible_name(self):
         skill_root = SCRIPT.resolve().parents[1]
