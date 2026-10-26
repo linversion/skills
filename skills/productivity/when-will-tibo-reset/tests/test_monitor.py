@@ -5,6 +5,7 @@ import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from unittest.mock import patch
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "monitor.py"
@@ -56,7 +57,7 @@ class MonitorTests(unittest.TestCase):
         self.notifications = []
         self.original_notify = monitor.notify
         monitor.notify = lambda config, title, local, webhook, **_options: self.notifications.append(
-            {"title": title, "local": local, "webhook": webhook}
+            {"title": title, "local": local, "webhook": webhook, "source_url": _options.get("source_url")}
         ) or []
 
     def tearDown(self):
@@ -131,7 +132,7 @@ class MonitorTests(unittest.TestCase):
         sent = []
         original_macos_notification = monitor.macos_notification
         monitor.notify = self.original_notify
-        monitor.macos_notification = lambda _config, title, _body: sent.append(title)
+        monitor.macos_notification = lambda _config, title, _body, source_url=None: sent.append(title)
         try:
             config = {"notifications": {"macos": True}, "webhooks": {}}
             monitor.notify(
@@ -146,6 +147,39 @@ class MonitorTests(unittest.TestCase):
         finally:
             monitor.macos_notification = original_macos_notification
         self.assertEqual(sent, ["Tibo: 动态标题"])
+
+    def test_notification_click_targets_the_same_post_as_the_message(self):
+        FeedHandler.payload["events"] = []
+        self.assertEqual(monitor.run_check(self.config_path), 0)
+        event = self.event("event-1")
+        event["posts"] = [
+            {"publishedAt": "2026-09-23T02:00:00+08:00", "url": "https://x.com/latest"},
+            {"publishedAt": "2026-09-23T01:00:00+08:00", "url": "https://x.com/older"},
+        ]
+        FeedHandler.payload["events"] = [event]
+        self.assertEqual(monitor.run_check(self.config_path), 0)
+        notification = self.notifications[-1]
+        self.assertEqual(notification["source_url"], "https://x.com/latest")
+        self.assertIn(notification["source_url"], notification["local"])
+        event["posts"][0].pop("url")
+        self.assertEqual(monitor.event_source_url(event), event["url"])
+        self.assertEqual(monitor.event_source_url({}), "")
+
+    def test_native_helper_receives_source_url_as_a_separate_argument(self):
+        app = self.directory / "Notifier.app"
+        executable = app / "Contents/MacOS/AIHotNotifier"
+        executable.parent.mkdir(parents=True)
+        executable.touch()
+        source_url = "https://x.com/thsottiaux/status/2113162413008884099"
+
+        def submitted(command, **_options):
+            Path(command[7]).write_text("submitted", encoding="utf-8")
+
+        with patch.object(monitor.subprocess, "run", side_effect=submitted) as launch:
+            monitor.macos_notification({"notifier_app": str(app)}, "中文标题", "中文正文", source_url)
+        command = launch.call_args.args[0]
+        self.assertEqual(command[5:7], ["中文标题", "中文正文"])
+        self.assertEqual(command[8], source_url)
 
     def test_source_uses_latest_post_url_then_falls_back_to_event_url(self):
         event = self.event("event-1")

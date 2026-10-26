@@ -146,6 +146,10 @@ def latest_post(event):
     return max(posts, key=lambda post: str(post.get("publishedAt") or ""))
 
 
+def event_source_url(event):
+    return str(latest_post(event).get("url") or event.get("url") or "").strip()
+
+
 def format_local_datetime(value):
     timestamp = str(value or "").strip()
     if not timestamp:
@@ -223,7 +227,7 @@ def build_messages(changes, language="zh"):
         posted = posted_line(post, language)
         if posted:
             shown.append(posted)
-        post_url = str(post.get("url") or latest_event.get("url") or "").strip()
+        post_url = event_source_url(latest_event)
         if post_url:
             label = "Source" if language == "en" else "来源"
             shown.append("{}: {}".format(label, post_url) if language == "en" else "{}：{}".format(label, post_url))
@@ -252,7 +256,7 @@ def build_messages(changes, language="zh"):
         posted = posted_line(post, language)
         if posted:
             detailed.append(posted)
-        url = str(post.get("url") or event.get("url") or "").strip()
+        url = event_source_url(event)
         if url:
             label = "Source" if language == "en" else "来源"
             detailed.append("{}: {}".format(label, url) if language == "en" else "{}：{}".format(label, url))
@@ -266,7 +270,7 @@ def build_messages(changes, language="zh"):
     return local_body, "\n".join(detailed)
 
 
-def macos_notification(config, title, body):
+def macos_notification(config, title, body, source_url=None):
     configured_path = str(config.get("notifier_app") or "").strip()
     app_path = Path(configured_path) if configured_path else Path(__file__).resolve().parent / "When will Tibo reset.app"
     executable = app_path / "Contents" / "MacOS" / "AIHotNotifier"
@@ -284,6 +288,7 @@ def macos_notification(config, title, body):
                 title,
                 body,
                 str(status_path),
+                str(source_url or ""),
             ],
             check=True,
             stdout=subprocess.DEVNULL,
@@ -339,13 +344,13 @@ def webhook_payload(config, channel, title, body):
     return {"msgtype": "text", "text": {"content": message}}
 
 
-def notify(config, title, local_body, webhook_body, channels=None, webhook_title=None, macos_title=None):
+def notify(config, title, local_body, webhook_body, channels=None, webhook_title=None, macos_title=None, source_url=None):
     errors = []
     selected = set(channels or ("macos", "feishu", "dingtalk", "wecom"))
     notifications = config.get("notifications", {})
     if "macos" in selected and notifications.get("macos", True):
         try:
-            macos_notification(config, format_macos_title(macos_title or title), local_body)
+            macos_notification(config, format_macos_title(macos_title or title), local_body, source_url)
             log("info", "macOS notification submitted")
         except Exception as exc:
             errors.append("macos: {}".format(exc))
@@ -421,6 +426,7 @@ def run_check(config_path):
         webhook_body,
         webhook_title=webhook_title,
         macos_title=webhook_title,
+        source_url=event_source_url(latest_event),
     )
     log("info", "changes detected", change_count=len(changes), delivery_errors=len(errors))
     return 2 if errors else 0

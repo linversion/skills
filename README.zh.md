@@ -53,6 +53,7 @@ npx skills update app-reviews
 
 - macOS 11+ 和 Python 3；通用版通知辅助 App 已随技能分发，无需安装 Xcode 或 Command Line Tools。首次启动可能需要按 Gatekeeper 提示手动放行并授予通知权限。
 - 通知支持持久样式和声音提醒，需在 macOS「系统设置 → 通知」中启用。
+- 点击新版通知可用默认浏览器打开对应的来源帖子；升级前已送达的旧通知不支持跳转。
 - 技能：[`skills/productivity/when-will-tibo-reset`](skills/productivity/when-will-tibo-reset/)
 
 **通知效果**

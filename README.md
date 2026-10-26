@@ -53,6 +53,7 @@ Checks AIHot's Codex reset updates every hour and sends a native macOS notificat
 
 - Requires macOS 11+ and Python 3. The universal notification helper app is bundled with the skill, so Xcode and Command Line Tools are not required. On first launch, macOS may ask you to approve the app in Gatekeeper and grant notification permission.
 - Notifications support persistent alerts and sound. Enable both in macOS System Settings → Notifications.
+- Click a new notification to open its source post in your default browser. Notifications delivered before this update do not support this action.
 - Skill: [`skills/productivity/when-will-tibo-reset`](skills/productivity/when-will-tibo-reset/)
 
 **Notification preview**

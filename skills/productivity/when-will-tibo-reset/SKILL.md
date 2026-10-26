@@ -47,6 +47,8 @@ python3 "$SKILL_DIR/scripts/manage.py" install --language en
 
 本地开发时，可将安装目录的 `runtime/monitor.py` 链接到本 skill 的 `scripts/monitor.py`，将 `runtime/When will Tibo reset.app` 链接到 `assets/When will Tibo reset.app`。切换前备份原文件，并保留配置中的通知助手路径。安装脚本会保留这两个指向当前源文件的符号链接。源目录需保持可访问；脚本修改会在下次轮询生效，Swift 源码修改需先重新构建通知助手 App。
 
+动态通知点击后会通过默认浏览器打开正文中的来源页面，优先使用该事件最新帖子的 X 链接，缺失时使用事件链接。多个事件合并时打开正文所展示的最后一条动态来源。此行为仅适用于新版助手发送的通知；升级前已送达的通知没有点击链接数据。修改 `NativeNotifier.swift` 后，在有 Xcode Command Line Tools 的开发机器运行 `bash "$SKILL_DIR/scripts/build_notifier.sh"` 重建随包分发的通用 App。
+
 ### 查看状态
 
 ```bash

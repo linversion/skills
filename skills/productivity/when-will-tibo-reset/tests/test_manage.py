@@ -109,7 +109,7 @@ class ManageTests(unittest.TestCase):
         self.assertEqual(info["CFBundleDisplayName"], "When will Tibo reset")
         self.assertEqual(info["CFBundleName"], "Tibo reset mon")
         self.assertLessEqual(len(info["CFBundleName"]), 15)
-        self.assertEqual(info["CFBundleVersion"], "3")
+        self.assertEqual(info["CFBundleVersion"], "4")
         self.assertEqual(manage.notifier_app_path().name, "When will Tibo reset.app")
 
     def test_skill_directory_and_frontmatter_use_the_new_slug(self):
